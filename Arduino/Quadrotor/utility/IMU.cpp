@@ -17,10 +17,12 @@ void IMU::Init()
   probStatic = Angle(0.02, 0, 0.02);
   
   //Initialize Accelerometer
-  accelerometer = Accelerometer(0x52);
+  accelerometer = Accelerometer();
+  accelerometer.Init();
   
   //Initialize Gyroscope
-  gyroscope = Gyroscope(0x68);
+  gyroscope = Gyroscope();
+  gyroscope.Init();
   
   //Initialize Compass
   //magnetometer((byte)0x1E);
@@ -41,7 +43,9 @@ void IMU::Update()
   //Local Variables
   Angle newAngVel, staticAng;
 
-  //Gather sensor and time measurements
+  //Gather sensor measurements
+  accelerometer.Update();
+  gyroscope.Update();
   accelerometer.Get(&acceleration);
   //magnetometer.Get(&magneticField);
   gyroscope.Get(&newAngVel);

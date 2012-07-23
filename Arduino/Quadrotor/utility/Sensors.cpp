@@ -18,8 +18,10 @@ void Sensor::Update() {
 //Modify these methods to use a different
 //3-axis accelerometer
 
-
 Accelerometer::Accelerometer(byte address) : Sensor(address) {
+}
+
+void Accelerometer::Init() {
 	Wire.beginTransmission(address);
 	
 	//Initialize the nunchuck
@@ -31,8 +33,7 @@ Accelerometer::Accelerometer(byte address) : Sensor(address) {
 
 	Wire.beginTransmission(address);
 	Wire.write(0xFB);
-	Wire.write(0x01);
-	Wire.write((uint8_t)0x00);
+	Wire.write((byte)0x00);
 
 	Wire.endTransmission();
 
@@ -42,17 +43,23 @@ Accelerometer::Accelerometer(byte address) : Sensor(address) {
 void Accelerometer::Update() {
 	byte in[6], ptr = 0;
 
+	Wire.beginTransmission(address);
 	Wire.requestFrom((byte)address, (byte)6);
 
 	while(Wire.available())
 		in[ptr++] = Wire.read();
 
+	Wire.endTransmission();
+
 	data.SetA( (in[2] << 2) + ((in[5] & B00001100) >> 2) );
 	data.SetB( (in[3] << 2) + ((in[5] & B00110000) >> 4) );
 	data.SetC( (in[4] << 2) + ((in[5] & B11000000) >> 6) );
 
+	//Serial.println(in[2]);
+
 	Wire.beginTransmission(address);
-	Wire.write( (uint8_t)0x00 );
+	Wire.write((byte)0x00);
+	Wire.write((byte)0x00);
 	Wire.endTransmission();
 }
 
@@ -67,6 +74,9 @@ void Accelerometer::Get(Vector *out) {
 //3-axis accelerometer
 
 Gyroscope::Gyroscope(byte address) : Sensor(address) {
+}
+
+void Gyroscope::Init() {
 	//Disable Sample-rate division
 	WriteRegister(0x15, 0);
 
@@ -181,6 +191,9 @@ void Gyroscope::ReadRegister(byte addr, byte count, byte *out) {
 Ranger		*_ranger;
 
 Ranger::Ranger() : Sensor() {
+}
+
+void Ranger::Init() {
 	//Initialize the global variable
 	_ranger = this;
 

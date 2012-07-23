@@ -6,7 +6,7 @@
 #include <Wire.h>
 
 void Altimeter::Init() {
-	ranger = Ranger();
+	ranger.Init();
 
 	//barometer();
 	seaPressure = 101325;

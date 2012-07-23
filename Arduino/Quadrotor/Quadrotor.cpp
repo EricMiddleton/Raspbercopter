@@ -2,20 +2,23 @@
 
 Quadrotor		*_quad;
 Model			*_model;
-unsigned long	_timerStartVal;
-byte			count;
+unsigned int	_timerStartVal;
+byte			_count;
 
-void Quadrotor::Init(int mass, int length, int thrust, int mAH) {
+Quadrotor::Quadrotor() {
+}
+
+void Quadrotor::Init(unsigned int mass, byte length, unsigned int thrust, unsigned int mAH) {
 	Serial.begin(115200);
-	Serial.println("Quadrotor Initialization Started!");
+	Serial.println(F("Initialization Started."));
 
 	//Initialize our global variables
 	_quad = this;
 	_model = &model;
-	count = 0;
+	_count = 0;
 
 	//Initiate our member classes
-	locator.Init();
+	//locator.Init();
 	//communicator.Init();
 	//battery.Init(mAH);
 	model.Init(mass, thrust);
@@ -26,21 +29,13 @@ void Quadrotor::Init(int mass, int length, int thrust, int mAH) {
 	//Puts in their loop(){} function!
 	InitTimer();
 
-	Serial.println("Quadrotor Initialization Complete!");
-}
-
-Vector Quadrotor::GetMOI() {
-	return model.GetMOI();
-}
-
-void Quadrotor::SetMOI(Vector MOI) {
-	model.SetMOI(MOI);
+	Serial.println(F("\tInitialized."));
 }
 
 Angle Quadrotor::GetOrientation() {
 	return model.GetOrientation();
 }
-
+/*
 float Quadrotor::GetAltitude() {
 	return locator.GetAltitude();
 }
@@ -56,7 +51,7 @@ Vector Quadrotor::GetVelocity() {
 float Quadrotor::GetGPSAccuracy() {
 	return locator.GetGPSAccuracy();
 }
-
+*/
 /*
 void Quadrotor::SendMessage(char *message) {
 	communicator.SendMessage(message);
@@ -90,7 +85,7 @@ void Quadrotor::Update() {
 void Quadrotor::InitTimer() {
 	//This value, combined with the 256 prescaler,
 	//Will result in a 100hz update rate
-	_timerStartVal = 64911;
+	_timerStartVal = 62411;//64911;
 
 	//Set prescaler to 256
 	TCCR3A = 0;
@@ -104,24 +99,25 @@ void Quadrotor::InitTimer() {
 }
 
 //Timer Interrupt
-ISR(TIMER3_OVF_vect) {}/*
-	//Disable this interrupt
-	TIMSK3 = 0<<TOIE3;
-	//Enable all other interrupts
+ISR(TIMER3_OVF_vect) {
 	interrupts();
+	TIMSK3 = 0<<TOIE3;
 
 	//Update our quadrotor model
 	//Every time the timer goes off
 	_model->Update();
 	
 	//Update the rest of the quad 1/10 of the time
-	if(!(count++ % 10))
+	if(!(_count++ % 10)) {
 		_quad->Update();
+		Serial.println(TCNT3 * 0.016f);
+	}
 	
-	if(count == 100) {
+	if(_count == 100) {
+		//TODO:
 		//This will be the 1hz update section
 		//Whenever I get to it
-		count = 0;
+		_count = 0;
 	}
 
 	//Reset the timer
@@ -129,4 +125,4 @@ ISR(TIMER3_OVF_vect) {}/*
 
 	//Re-enable the interrupt
 	TIMSK3 = 1<<TOIE3;
-}*/
+}

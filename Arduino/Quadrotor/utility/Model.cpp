@@ -47,9 +47,8 @@ float PID::Update(float wanted, float current) {
 -That contains and controls the-
 ----Motors, IMU and PID loops---
 ------------------------------*/
-void Model::Init(float mass, unsigned int thrust) {
+void Model::Init(unsigned int mass, unsigned int thrust) {
 	angle = Angle(0, 0, 0);
-	height = 1.;
 
 	this->mass = mass;
 
@@ -63,14 +62,13 @@ void Model::Init(float mass, unsigned int thrust) {
 	motor3.SetThrust(thrust);
 	motor4.SetThrust(thrust);
 
-	Serial.println("Enter any key to finish setting esc bounds!");
+	Serial.println(F("Connect Motors"));
 	while(!Serial.available());
-	
+
 	motor1.SetThrust(0);
 	motor2.SetThrust(0);
 	motor3.SetThrust(0);
 	motor4.SetThrust(0);
-
 
 	imu.Init();
 
@@ -97,68 +95,33 @@ void Model::SetAngle(Angle a) {
 	angle = a;
 }
 
-unsigned int thrust = 0;
 void Model::Update() {
 	altimeter.UpdateRanger();
 
-	if(Serial.available()) {
-		char ch = Serial.read() - 48;
-		thrust += 50*((ch == 6) - (ch == 4));
-		thrust *= !!ch;
-		if(thrust > 10000)
-			thrust = 0;
-		else if(thrust > 750)
-			thrust = 0;
-
-		motor1.SetThrust(thrust);
-		motor2.SetThrust(thrust);
-		motor3.SetThrust(thrust);
-		motor4.SetThrust(thrust);
-	}
 	Angle curAng, force;
-	float motorOut1, motorOut2, motorOut3, motorOut4, altPid, alt;
+	float motorOut1, motorOut2, altPid;
 
 	imu.Update();
 
 	curAng = imu.GetOrientation();
-	alt = altimeter.GetRangerAltitude(curAng);
 
 	force = Angle(
 				pid1.Update(angle.GetPitch(), curAng.GetPitch()),
 				pid2.Update(angle.GetYaw(), curAng.GetYaw()),
 				pid3.Update(angle.GetRoll(), curAng.GetRoll()))*50;
 
-	altPid = 0;//pid4.Update(height, alt);
+	altPid = 0;//pid4.Update(height, altimeter.GetRangerAltitude(curAng));
 				
 	//Quadrotor has cross-type layout
 	//So each motor affects both pitch and roll
 	//motor[0] is at front-left and motor[3] is bottom-left
-	motorOut1 = force.GetPitch() + force.GetRoll() + altPid;
-	motorOut2 = force.GetPitch() - force.GetRoll() + altPid;
-	//Let's exploit some symmetry!
-	motorOut3 = -motorOut1;
-	motorOut4 = -motorOut2;
+	motorOut1 = force.GetPitch() + force.GetRoll();
+	motorOut2 = force.GetPitch() - force.GetRoll();
 
-	count++;
-	if(count == 25) {
-/*
-		Serial.print(motorOut1);
-		Serial.print("      ");
-		Serial.print(motorOut2);
-		Serial.print("      ");
-		Serial.print(motorOut3);
-		Serial.print("      ");
-		Serial.print(motorOut4);
-		Serial.print("      ");
-		Serial.println(alt);
-*/
-		curAng.Print();
-
-		count = 0;
-	}/*
-	motor1.SetThrust(max(0, motorOut1));
-	motor2.SetThrust(max(0, motorOut2));
-	motor3.SetThrust(max(0, motorOut3));
-	motor4.SetThrust(max(0, motorOut4));*/
+	/*
+	motor1.SetThrust(max(0, motorOut1 + altPid));
+	motor2.SetThrust(max(0, motorOut2 + altPid));
+	motor3.SetThrust(max(0, -motorOut1 + altPid));
+	motor4.SetThrust(max(0, -motorOut2 + altPid));*/
 
 }

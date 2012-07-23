@@ -24,9 +24,7 @@ private:
 class Model
 {
 public:
-	void Init(float mass, unsigned int thrust);
-	Vector GetMOI();
-	void SetMOI(Vector moi);
+	void Init(unsigned int mass, unsigned int thrust);
 	Vector GetPID();
 	void SetPID(Vector v);
 	Angle GetAngle();
@@ -38,10 +36,8 @@ private:
 	IMU imu;
 	Altimeter altimeter;
 	PID pid1, pid2, pid3, pid4;
-	float mass;
+	unsigned int mass;
 	Angle angle;
-	float height;
-	byte count;
 };
 
 #endif

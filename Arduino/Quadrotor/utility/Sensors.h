@@ -18,7 +18,8 @@ protected:
 class Accelerometer : Sensor
 {
 public:
-			Accelerometer(byte address = 0);
+			Accelerometer(byte address = 0x52);
+	void	Init();
 	void	Update();
 	void	Get(Vector *out);
 };
@@ -26,7 +27,8 @@ public:
 class Gyroscope : Sensor
 {
 public:
-			Gyroscope(byte address = 0);
+			Gyroscope(byte address = 0x68);
+	void	Init();
 	void	Update();
 	void	Get(Angle *out);
 private:
@@ -57,6 +59,7 @@ class Ranger : Sensor
 {
 public:
 							Ranger();
+	void					Init();
 	void					Update();
 	void					Get(float *out);
 private:

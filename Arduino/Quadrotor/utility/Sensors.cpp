@@ -38,21 +38,18 @@ void Accelerometer::Init() {
 }
 
 void Accelerometer::Update() {
-	return;
 	byte in[6], ptr = 0;
-	//Let's timeout after 5 milliseconds
 
 	Wire.requestFrom(address, (byte)6);
 
-	//Wait until we have 6 bytes in the queue
 	while(Wire.available() && ptr < 6)
 		in[ptr++] = Wire.read();
 
-	/*if(ptr == 6) {
-		data.SetA( (in[2] << 2) + ((in[5] & B00001100) >> 2) );
-		data.SetB( (in[3] << 2) + ((in[5] & B00110000) >> 4) );
-		data.SetC( (in[4] << 2) + ((in[5] & B11000000) >> 6) );
-	}*/
+	if(ptr == 6) {
+		data.SetA( ((in[3] << 2) + ((in[5] & 0x30) >> 4)) - 512 );
+		data.SetB( ((in[2] << 2) + ((in[5] & 0x0C) >> 2)) - 512 );
+		data.SetC( ((in[4] << 2) + ((in[5] & 0xC0) >> 6)) - 512 );
+	}
 
 	Wire.beginTransmission(address);
 	Wire.write(0x00);
@@ -79,11 +76,11 @@ void Gyroscope::Init() {
 	//Set +/-2000 deg/sec range with 256hz filter
 	WriteRegister(0x16, 0x18 );
 
-	//Disable sleep mode and enable internal oscillator
-	WriteRegister(0x3E, 0);
-
 	//Enable the fresh data interrupt
 	WriteRegister(0x17, 0x15);
+
+	//Disable sleep mode and enable internal oscillator
+	WriteRegister(0x3E, 0);
 
 	//Wait for everything to initialize properly
 	delay(70);
@@ -92,24 +89,21 @@ void Gyroscope::Init() {
 }
 
 void Gyroscope::Update() {
-	//If fresh data is ready
-	if(ReadRegister(0x1A) & 0x01) {
-		byte in[6];
-		int rawX, rawY, rawZ;
+	byte in[6];
+	int rawX, rawY, rawZ;
 		
-		//Read Raw 16-bit Gyroscope values
-		ReadRegister(0x1D, 6, in);
-		rawX = (ReadRegister(0x1D) << 8) | ReadRegister(0x1E);
-		rawY = (ReadRegister(0x1F) << 8) | ReadRegister(0x20);
-		rawZ = (ReadRegister(0x21) << 8) | ReadRegister(0x22);
+	//Read Raw 16-bit Gyroscope values
+	ReadRegister(0x1D, 6, in);
+	rawX = (ReadRegister(0x1D) << 8) | ReadRegister(0x1E);
+	rawY = (ReadRegister(0x1F) << 8) | ReadRegister(0x20);
+	rawZ = (ReadRegister(0x21) << 8) | ReadRegister(0x22);
 
-		//Convert the values into proper orientation
-		//Radian values. Magic value '0.00106529695f'
-		//is 2000 deg/s / 0x7FFF * PI / 180
-		data.SetA(rawX * 0.00106529695f);
-		data.SetB(-rawZ * 0.00106529695f);
-		data.SetC(rawY * 0.00106529695f);
-	}
+	//Convert the values into proper orientation
+	//Radian values. Magic value '0.0005326403454625252390092899270584f'
+	//is 2000 deg/s / 0xFFFF * PI / 180
+	data.SetA(rawX * 0.0005326403454625252390092899270584f);
+	data.SetB(-rawZ * 0.0005326403454625252390092899270584f);
+	data.SetC(rawY * 0.0005326403454625252390092899270584f);
 }
 
 void Gyroscope::Get(Angle *out) {

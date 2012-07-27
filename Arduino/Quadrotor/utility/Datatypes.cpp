@@ -77,7 +77,7 @@ float Vector::GetZ() {
 
 Angle Vector::ToAngle(byte ref) {
 	if(ref == GRAVITY)
-		return Angle(atan2(c, a), 0, atan2(c, b));
+		return Angle(atan2(a, c), 0, atan2(b, c));
 	else
 		return Angle(0, 0, 0);
 }

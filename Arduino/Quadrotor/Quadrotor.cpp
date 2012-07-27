@@ -10,6 +10,7 @@ Quadrotor::Quadrotor() {
 }
 
 void Quadrotor::Init(unsigned int mass, byte length, unsigned int thrust, unsigned int mAH) {
+	Wire.begin();
 	Serial.begin(115200);
 	Serial.println(F("Initialization Started."));
 
@@ -113,13 +114,13 @@ ISR(TIMER3_OVF_vect) {
 	//Update the rest of the quad 1/10 of the time
 	if(!(_count++ % 10)) {
 		_quad->Update();
+		_quad->GetOrientation().Print();
 	}
 	
 	if(_count == 100) {
 		//TODO:
 		//This will be the 1hz update section
 		//Whenever I get to it
-		_quad->GetOrientation().Print();
 		_count = 0;
 	}
 

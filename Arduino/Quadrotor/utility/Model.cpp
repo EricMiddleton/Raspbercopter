@@ -109,7 +109,7 @@ void Model::Update() {
 				pid1.Update(angle.GetPitch(), curAng.GetPitch()),
 				pid2.Update(angle.GetYaw(), curAng.GetYaw()),
 				pid3.Update(angle.GetRoll(), curAng.GetRoll()));
-	altPid = 0;//pid4.Update(height, altimeter.GetRangerAltitude(curAng));
+	altPid = 10;//pid4.Update(height, altimeter.GetRangerAltitude(curAng));
 				
 	//Quadrotor has cross-type layout
 	//So each motor affects both pitch and roll

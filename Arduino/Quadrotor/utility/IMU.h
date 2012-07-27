@@ -22,5 +22,6 @@ private:
   //Magnetometer		magnetometer;
   Vector			acceleration;//, magneticField;
   Angle				angularVelocity, orientation, probGyro, probStatic;
+  unsigned int		lastTime;
 };
 #endif

@@ -1,4 +1,5 @@
 #include "Quadrotor.h"
+#include "utility/Memory.h"
 
 Quadrotor		*_quad;
 Model			*_model;
@@ -22,12 +23,14 @@ void Quadrotor::Init(unsigned int mass, byte length, unsigned int thrust, unsign
 	//communicator.Init();
 	//battery.Init(mAH);
 	model.Init(mass, thrust);
+	Serial.println(F("Model Init Complete."));
 
 
 	//Let's update our quadrocopter
 	//Independently of whatever the user
 	//Puts in their loop(){} function!
 	InitTimer();
+	Serial.println(F("Timer Init Complete."));
 
 	Serial.println(F("\tInitialized."));
 }
@@ -85,7 +88,7 @@ void Quadrotor::Update() {
 void Quadrotor::InitTimer() {
 	//This value, combined with the 256 prescaler,
 	//Will result in a 100hz update rate
-	_timerStartVal = 62411;//64911;
+	_timerStartVal = 64911;
 
 	//Set prescaler to 256
 	TCCR3A = 0;
@@ -100,8 +103,8 @@ void Quadrotor::InitTimer() {
 
 //Timer Interrupt
 ISR(TIMER3_OVF_vect) {
+	TIMSK3 = 0;
 	interrupts();
-	TIMSK3 = 0<<TOIE3;
 
 	//Update our quadrotor model
 	//Every time the timer goes off
@@ -110,13 +113,13 @@ ISR(TIMER3_OVF_vect) {
 	//Update the rest of the quad 1/10 of the time
 	if(!(_count++ % 10)) {
 		_quad->Update();
-		Serial.println(TCNT3 * 0.016f);
 	}
 	
 	if(_count == 100) {
 		//TODO:
 		//This will be the 1hz update section
 		//Whenever I get to it
+		_quad->GetOrientation().Print();
 		_count = 0;
 	}
 

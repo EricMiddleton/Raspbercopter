@@ -1,10 +1,9 @@
 #pragma once
 #ifndef LOCATOR_H
 #define LOCATOR_H
-
+/*
 #include <Arduino.h>
 #include <string.h>
-#include <avr/interrupt.h>
 #include "Datatypes.h"
 
 class Locator {
@@ -33,5 +32,5 @@ class Locator {
 extern char          message[256];
 extern byte          ptr;
 void serialEvent1();
-
+*/
 #endif

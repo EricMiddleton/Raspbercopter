@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include "Locator.h"
 
 Locator *_locator;
@@ -30,9 +31,6 @@ void Locator::Init() {
 	ptr = 0;
 
 	_locator = this;
-
-	Serial1.begin(115200);
-	UCSR1B |= (1 << RXCIE1);
 
   lastTime = millis();
   velocity = Vector(0, 0, 0);
@@ -120,3 +118,4 @@ void serialEvent() {
 			message[ptr++] = ch;
 	}
 }
+*/

@@ -32,6 +32,6 @@ float Altimeter::GetRangerAltitude(Angle orientation) {
 }
 
 float Altimeter::GetBarometerAltitude() {
-	return altitude;
+	return 0;//altitude;
 }
 #endif

@@ -2,9 +2,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#define PINBASE		9
+
 #include "Datatypes.h"
 #include <Arduino.h>
-#include "Motor.h"
+#include <Servo.h>
 #include "IMU.h"
 #include "Altimeter.h"
 
@@ -18,7 +20,6 @@ public:
 private:
 	float p, i, d;
 	float error, dError, sError;
-	int lastTime;
 };
 
 class Model
@@ -32,11 +33,12 @@ public:
 	void SetAngle(Angle a);
 	void Update();
 private:
-	Motor motor1, motor2, motor3, motor4;
+	Servo motor1, motor2, motor3, motor4;
 	IMU imu;
 	Altimeter altimeter;
 	PID pid1, pid2, pid3, pid4;
-	unsigned int mass;
+	unsigned int mass, thrust;
+	float multiplier;
 	Angle angle;
 };
 

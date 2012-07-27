@@ -16,8 +16,7 @@ public:
 private:
 	//Barometer				barometer;
 	Ranger					ranger;
-	unsigned long			seaPressure;
-	float					altitude;
+	unsigned int			seaPressure;
 
 };
 

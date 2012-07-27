@@ -17,14 +17,12 @@ void Sensor::Update() {
 //Accelerometer: Wii Nunchuck
 //Modify these methods to use a different
 //3-axis accelerometer
-
 Accelerometer::Accelerometer(byte address) : Sensor(address) {
 }
 
 void Accelerometer::Init() {
-	Wire.beginTransmission(address);
-	
 	//Initialize the nunchuck
+	Wire.beginTransmission(address);
 	Wire.write(0xF0);
 	Wire.write(0x55);
 	Wire.endTransmission();
@@ -33,33 +31,31 @@ void Accelerometer::Init() {
 
 	Wire.beginTransmission(address);
 	Wire.write(0xFB);
-	Wire.write((byte)0x00);
-
+	Wire.write(0x00);
 	Wire.endTransmission();
 
 	Update();
 }
 
 void Accelerometer::Update() {
+	return;
 	byte in[6], ptr = 0;
+	//Let's timeout after 5 milliseconds
 
-	Wire.beginTransmission(address);
-	Wire.requestFrom((byte)address, (byte)6);
+	Wire.requestFrom(address, (byte)6);
 
-	while(Wire.available())
+	//Wait until we have 6 bytes in the queue
+	while(Wire.available() && ptr < 6)
 		in[ptr++] = Wire.read();
 
-	Wire.endTransmission();
-
-	data.SetA( (in[2] << 2) + ((in[5] & B00001100) >> 2) );
-	data.SetB( (in[3] << 2) + ((in[5] & B00110000) >> 4) );
-	data.SetC( (in[4] << 2) + ((in[5] & B11000000) >> 6) );
-
-	//Serial.println(in[2]);
+	/*if(ptr == 6) {
+		data.SetA( (in[2] << 2) + ((in[5] & B00001100) >> 2) );
+		data.SetB( (in[3] << 2) + ((in[5] & B00110000) >> 4) );
+		data.SetC( (in[4] << 2) + ((in[5] & B11000000) >> 6) );
+	}*/
 
 	Wire.beginTransmission(address);
-	Wire.write((byte)0x00);
-	Wire.write((byte)0x00);
+	Wire.write(0x00);
 	Wire.endTransmission();
 }
 

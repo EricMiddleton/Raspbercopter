@@ -26,16 +26,14 @@ void IMU::Init()
   
   //Initialize Compass
   //magnetometer((byte)0x1E);
-  
-  //Gather and Calculate inital values
-  accelerometer.Get(&acceleration);
-  //magnetometer.Get(&magneticField);
-  gyroscope.Get(&angularVelocity);
 
   //We'll assume a zero starting angle
   //If not, it will correct itself in a few seconds
   //thanks to the accelerometer
   orientation = Angle(0, 0, 0);
+
+  Update();
+  Serial.println(F("Update"));
 }
 
 void IMU::Update()
@@ -47,7 +45,6 @@ void IMU::Update()
   accelerometer.Update();
   gyroscope.Update();
   accelerometer.Get(&acceleration);
-  //magnetometer.Get(&magneticField);
   gyroscope.Get(&newAngVel);
 
   //Calculate Angle from gravity vector
@@ -56,7 +53,7 @@ void IMU::Update()
   
   //Estimate position from static angle and the gyroscope integration
   //Magic value '0.01f' is dt
-  orientation = staticAng;//((orientation + (angularVelocity + newAngVel)*0.01f)*probGyro + staticAng*probStatic);
+  orientation = newAngVel;//((orientation + (angularVelocity + newAngVel)*0.01f)*probGyro + staticAng*probStatic);
   
   //Keep all angles between -PI and PI
   orientation.wrap();
